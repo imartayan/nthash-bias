@@ -55,12 +55,16 @@ def make_fig(entry, relative):
         norm = mcolors.TwoSlopeNorm(vmin=0, vcenter=1, vmax=vmax)
         cmap = "bwr"
         cbar_label = "observed probability / expected probability"
+        from matplotlib.ticker import MaxNLocator
+        upper_ticks = MaxNLocator(nbins=4).tick_values(1, vmax)
+        cbar_ticks = [0.0, 1.0] + [t for t in upper_ticks if 1.0 < t <= vmax]
     else:
         plot_data = cond
         pos = cond[cond > 0]
         norm = mcolors.LogNorm(vmin=pos.min(), vmax=pos.max()) if pos.size else None
         cmap = None
         cbar_label = "P(next #LZ | current #LZ)"
+        cbar_ticks = None
 
     im = ax.imshow(
         plot_data,
@@ -70,7 +74,7 @@ def make_fig(entry, relative):
         norm=norm,
         cmap=cmap,
     )
-    plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label=cbar_label)
+    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label=cbar_label, ticks=cbar_ticks)
 
     H, W = cond.shape
     ax.set_yticks(range(H))
