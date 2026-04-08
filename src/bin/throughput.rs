@@ -37,16 +37,16 @@ fn main() {
         eprintln!("nthash-rs crate:\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
     }
 
-    // ascii iter + fxhash
+    // ascii iter + rapidhash
     {
         let t = Instant::now();
         let checksum = ascii.windows(K).fold(0u64, |acc, kmer| {
-            acc.wrapping_add(rustc_hash::FxBuildHasher.hash_one(kmer))
+            acc.wrapping_add(rapidhash::fast::GlobalState::default().hash_one(kmer))
         });
         let elapsed = t.elapsed().as_secs_f64();
         black_box(checksum);
         eprintln!(
-            "ascii seq + fxhash:\t{:.2} GB/s",
+            "ascii seq + rapidhash:\t{:.2} GB/s",
             LEN as f64 / 1e9 / elapsed
         );
     }
