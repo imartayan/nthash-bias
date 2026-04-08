@@ -6,14 +6,14 @@ import matplotlib.colors as mcolors
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-f", "--format", nargs="*", default=["png"], help="output formats (default: png)"
+    "-f", "--format", nargs="*", default=[], help="output formats (default: show)"
 )
 parser.add_argument(
     "-l",
     "--label",
     type=str,
     default="plot-bias",
-    help="output file prefix; saves label-abs.fmt and label-rel.fmt (default: show)",
+    help="output file prefix; saves label-abs.fmt and label-rel.fmt",
 )
 args = parser.parse_args()
 
@@ -56,6 +56,7 @@ def make_fig(entry, relative):
         cmap = "bwr"
         cbar_label = "observed probability / expected probability"
         from matplotlib.ticker import MaxNLocator
+
         upper_ticks = MaxNLocator(nbins=4).tick_values(1, vmax)
         cbar_ticks = [0.0, 1.0] + [t for t in upper_ticks if 1.0 < t <= vmax]
     else:
@@ -74,7 +75,9 @@ def make_fig(entry, relative):
         norm=norm,
         cmap=cmap,
     )
-    cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label=cbar_label, ticks=cbar_ticks)
+    cbar = plt.colorbar(
+        im, ax=ax, fraction=0.046, pad=0.04, label=cbar_label, ticks=cbar_ticks
+    )
 
     H, W = cond.shape
     ax.set_yticks(range(H))
@@ -96,7 +99,7 @@ def make_fig(entry, relative):
 for entry in data:
     for relative, suffix in [(False, "abs"), (True, "rel")]:
         fig = make_fig(entry, relative)
-        if fig is None:
+        if fig is None or not args.format:
             continue
         for fmt in args.format:
             seed = entry["seed"]
@@ -105,3 +108,5 @@ for entry in data:
             print(f"Saving {out}")
             fig.savefig(out, bbox_inches="tight", dpi=300)
         plt.close(fig)
+    if not args.format:
+        plt.show()
