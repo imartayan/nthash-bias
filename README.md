@@ -15,3 +15,10 @@ cargo r -r -- -r 1 7 -t 4 | python plot-bias.py -f pdf svg
 
 <img width="640" height="480" alt="plot-bias-R1-k31-abs" src="https://github.com/user-attachments/assets/a208e124-ddec-42cb-8419-3c4181b54043" />
 <img width="640" height="480" alt="plot-bias-R1-k31-rel" src="https://github.com/user-attachments/assets/23c3e776-9e3d-4ab9-a389-5c4ce2c12380" />
+
+## Throughput benchmark
+
+A simple benchmark measuring the throughput of different *k*-mer hashing methods is available with:
+```sh
+cargo r -r --bin throughput
+```
