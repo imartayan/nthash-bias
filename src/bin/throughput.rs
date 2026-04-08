@@ -1,5 +1,5 @@
 use seq_hash::packed_seq::{AsciiSeqVec, PackedSeqVec, Seq, SeqVec, u32x8};
-use seq_hash::{KmerHasher, NtHasher};
+use seq_hash::{KmerHasher, MulHasher, NtHasher};
 
 use core::hash::BuildHasher;
 use core::hint::black_box;
@@ -75,7 +75,7 @@ fn main() {
         );
     }
 
-    // seq-hash NtHash
+    // seq-hash nthash
     {
         let hasher = NtHasher::<false, 1>::new(K);
         let simd_len = (LEN + 7 * (K - 1)).div_ceil(8);
@@ -90,5 +90,22 @@ fn main() {
         let elapsed = t.elapsed().as_secs_f64();
         black_box(checksum);
         eprintln!("seq-hash nthash:\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
+    }
+
+    // seq-hash mulhash
+    {
+        let hasher = MulHasher::<false, 1>::new(K);
+        let simd_len = (LEN + 7 * (K - 1)).div_ceil(8);
+        let t = Instant::now();
+        let mut checksum = u32x8::ZERO;
+        hasher
+            .hash_kmers_simd(packed.as_slice(), 1)
+            .advance_with(simd_len, |v| {
+                checksum += v;
+            });
+        let checksum = checksum.as_array_ref().iter().sum::<u32>();
+        let elapsed = t.elapsed().as_secs_f64();
+        black_box(checksum);
+        eprintln!("seq-hash mulhash:\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
     }
 }

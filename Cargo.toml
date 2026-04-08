@@ -7,7 +7,7 @@ default-run = "bias"
 [dependencies]
 clap = { version = "4.6", features = ["derive"] }
 needletail = "0.7"
-nthash = "0.4"
+nthash = "0.5"
 nthash-rs = "0.1"
 rayon = "1"
 rustc-hash = "2.1"
