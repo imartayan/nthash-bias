@@ -66,7 +66,7 @@ def make_fig(entry, relative):
         plot_data,
         origin="upper",
         aspect="auto",
-        interpolation="none",
+        interpolation="nearest",
         norm=norm,
         cmap=cmap,
     )
