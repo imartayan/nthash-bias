@@ -3,7 +3,6 @@ use seq_hash::{KmerHasher, MulHasher, NtHasher};
 
 use core::hash::BuildHasher;
 use core::hint::black_box;
-use rustc_hash::FxBuildHasher;
 use std::time::Instant;
 
 const LEN: usize = 100_000_000;
@@ -13,6 +12,17 @@ const MASK: u64 = (1 << (2 * K)) - 1;
 fn main() {
     let ascii: Vec<u8> = AsciiSeqVec::random(LEN).seq;
     let packed = PackedSeqVec::from_ascii(&ascii);
+
+    // nthash crate
+    {
+        let t = Instant::now();
+        let checksum: u64 = nthash::NtHashForwardIterator::new(&ascii, K)
+            .unwrap()
+            .fold(0u64, |acc, h| acc.wrapping_add(h));
+        let elapsed = t.elapsed().as_secs_f64();
+        black_box(checksum);
+        eprintln!("nthash crate:\t\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
+    }
 
     // nthash-rs crate
     {
@@ -27,22 +37,11 @@ fn main() {
         eprintln!("nthash-rs crate:\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
     }
 
-    // nthash crate
-    {
-        let t = Instant::now();
-        let checksum: u64 = nthash::NtHashIterator::new(&ascii, K)
-            .unwrap()
-            .fold(0u64, |a, h| a.wrapping_add(h));
-        let elapsed = t.elapsed().as_secs_f64();
-        black_box(checksum);
-        eprintln!("nthash crate:\t\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
-    }
-
     // ascii iter + fxhash
     {
         let t = Instant::now();
         let checksum = ascii.windows(K).fold(0u64, |acc, kmer| {
-            acc.wrapping_add(FxBuildHasher.hash_one(kmer))
+            acc.wrapping_add(rustc_hash::FxBuildHasher.hash_one(kmer))
         });
         let elapsed = t.elapsed().as_secs_f64();
         black_box(checksum);
@@ -65,7 +64,7 @@ fn main() {
             .skip(K - 1)
             .fold(0u64, |acc, bp| {
                 kmer = ((kmer << 2) | bp as u64) & MASK;
-                acc.wrapping_add(FxBuildHasher.hash_one(kmer))
+                acc.wrapping_add(rustc_hash::FxBuildHasher.hash_one(kmer))
             });
         let elapsed = t.elapsed().as_secs_f64();
         black_box(checksum);
