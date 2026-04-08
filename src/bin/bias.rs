@@ -1,3 +1,4 @@
+#[path = "../simd.rs"]
 mod simd;
 
 use clap::Parser;

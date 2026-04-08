@@ -2,6 +2,7 @@
 name = "nthash-bias"
 version = "0.1.0"
 edition = "2024"
+default-run = "bias"
 
 [dependencies]
 clap = { version = "4.6", features = ["derive"] }
