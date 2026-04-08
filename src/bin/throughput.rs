@@ -13,30 +13,6 @@ fn main() {
     let ascii: Vec<u8> = AsciiSeqVec::random(LEN).seq;
     let packed = PackedSeqVec::from_ascii(&ascii);
 
-    // nthash crate
-    {
-        let t = Instant::now();
-        let checksum: u64 = nthash::NtHashForwardIterator::new(&ascii, K)
-            .unwrap()
-            .fold(0u64, |acc, h| acc.wrapping_add(h));
-        let elapsed = t.elapsed().as_secs_f64();
-        black_box(checksum);
-        eprintln!("nthash crate:\t\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
-    }
-
-    // nthash-rs crate
-    {
-        let t = Instant::now();
-        let mut checksum: u64 = 0;
-        let mut hasher = nthash_rs::NtHash::new(&ascii, K as u16, 1, 0).unwrap();
-        while hasher.roll() {
-            checksum = checksum.wrapping_add(hasher.hashes()[0]);
-        }
-        let elapsed = t.elapsed().as_secs_f64();
-        black_box(checksum);
-        eprintln!("nthash-rs crate:\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
-    }
-
     // ascii iter + rapidhash
     {
         let t = Instant::now();
@@ -72,6 +48,17 @@ fn main() {
             "packed-seq + fxhash:\t{:.2} GB/s",
             LEN as f64 / 1e9 / elapsed
         );
+    }
+
+    // nthash crate
+    {
+        let t = Instant::now();
+        let checksum: u64 = nthash::NtHashForwardIterator::new(&ascii, K)
+            .unwrap()
+            .fold(0u64, |acc, h| acc.wrapping_add(h));
+        let elapsed = t.elapsed().as_secs_f64();
+        black_box(checksum);
+        eprintln!("nthash crate:\t\t{:.2} GB/s", LEN as f64 / 1e9 / elapsed);
     }
 
     // seq-hash nthash
