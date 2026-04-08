@@ -7,8 +7,8 @@ use rayon::prelude::*;
 use rayon::{ThreadPoolBuilder, current_num_threads};
 use serde::Serialize;
 
-use simd_minimizers::packed_seq::{PackedSeqVec, SeqVec};
-use simd_minimizers::seq_hash::{KmerHasher, NtHasher};
+use seq_hash::packed_seq::{PackedSeqVec, SeqVec};
+use seq_hash::{KmerHasher, NtHasher};
 
 use core::cell::RefCell;
 use std::time::Instant;

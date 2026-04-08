@@ -1,4 +1,4 @@
-use simd_minimizers::private::S;
+use seq_hash::packed_seq::u32x8 as S;
 
 /// Count leading zeros for each u32 lane of a `u32x8`.
 #[inline(always)]

@@ -1,5 +1,5 @@
-use simd_minimizers::packed_seq::{AsciiSeqVec, PackedSeqVec, Seq, SeqVec, u32x8};
-use simd_minimizers::seq_hash::{KmerHasher, NtHasher};
+use seq_hash::packed_seq::{AsciiSeqVec, PackedSeqVec, Seq, SeqVec, u32x8};
+use seq_hash::{KmerHasher, NtHasher};
 
 use core::hash::BuildHasher;
 use core::hint::black_box;
